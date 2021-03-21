@@ -1,9 +1,12 @@
 package com.github.funczz.gradle.plugin.payara_micro
 
 import io.kotlintest.matchers.string.shouldEndWith
+import io.kotlintest.matchers.string.shouldStartWith
 import io.kotlintest.shouldBe
+import io.kotlintest.shouldThrow
 import io.kotlintest.specs.StringSpec
 import java.io.File
+import java.util.concurrent.TimeoutException
 
 class PayaraMicroUberJarGeneratorTest : StringSpec() {
 
@@ -29,17 +32,24 @@ class PayaraMicroUberJarGeneratorTest : StringSpec() {
             if (jar.exists()) jar.deleteRecursively()
             PayaraMicroUberJarGenerator(
                 payaraMicroJarFile = payara,
-                rootWar = war,
-                uberJar = jar,
                 workDir = buildDir,
-            )
-                .outputUberJar()
+            ).outputUberJar(rootWar = war, uberJar = jar)
             val start = System.currentTimeMillis()
             while (!jar.exists()) {
                 Thread.sleep(100L)
                 if (System.currentTimeMillis() - start > 5000L) break
             }
             jar.exists() shouldBe true
+        }
+
+        "outputUberJar - timeout" {
+            shouldThrow<TimeoutException> {
+                PayaraMicroUberJarGenerator(
+                    payaraMicroJarFile = payara,
+                    workDir = buildDir,
+                    timeout = 1L,
+                ).outputUberJar(rootWar = war, uberJar = jar)
+            }.message shouldStartWith "command line: java -jar "
         }
 
     }
