@@ -114,6 +114,13 @@ allprojects {
  */
 
 /**
+ * dependencies
+ */
+dependencies {
+    //payara-micro
+    testImplementation("fish.payara.extras:payara-micro:5.2021.1")
+}
+/**
  * plugin: java-gradle-plugin
  */
 gradlePlugin {
@@ -141,4 +148,36 @@ val functionalTest by tasks.creating(Test::class) {
 val check by tasks.getting(Task::class) {
     // Run the functional tests as part of `check`
     dependsOn(functionalTest)
+}
+
+/**
+ * task: test
+ * deploy PayaraMicro Jar
+ */
+fun Project.getPayaraMicroJar(): File? {
+    val regex = """fish\.payara\.extras.payara-micro.+payara-micro\-[\d\.]+\.jar$""".toRegex()
+    val files = this.configurations
+        .filter {
+            it.toString().contains("""Classpath""".toRegex())
+        }.map {
+            it.files
+        }.flatten()
+    files.filter {
+        it.isFile
+    }.filter {
+        it.canonicalPath.contains(regex)
+    }.forEach {
+        return it
+    }
+    return null
+}
+
+tasks.test {
+    useJUnitPlatform() //task: kotlintest-runner-junit5
+    doFirst {
+        val payaraMicroJar = File(buildDir, "payara-micro.jar")
+        if (!payaraMicroJar.exists()) {
+            project.getPayaraMicroJar()!!.copyTo(payaraMicroJar, overwrite = true)
+        }
+    }
 }
