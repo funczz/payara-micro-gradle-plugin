@@ -47,7 +47,7 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
             val result = runner.build()
 
             // Verify the result
-            result.output shouldContain ""
+            result.output shouldContain "Payara Micro "
         }
     }
 }
