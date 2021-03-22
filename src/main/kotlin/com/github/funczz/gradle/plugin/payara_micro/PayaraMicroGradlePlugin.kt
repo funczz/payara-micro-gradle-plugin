@@ -16,9 +16,10 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
 
     /**
      * プロジェクトのクラスパスから payaraMicroJar を取得する
-     * @return payaraMicroJar の File オブジェクト。未検出は null
+     * @return payaraMicroJar の File オブジェクト
+     * @throws NoSuchPayaraMicroJarFileException payaraMicroJar 未検出
      */
-    private fun Project.getPayaraMicroJar(): File? {
+    private fun Project.getPayaraMicroJar(): File {
         val regex = """fish\.payara\.extras.payara-micro.+payara-micro-.*\.jar$""".toRegex()
         this.configurations
             .asSequence()
@@ -35,7 +36,7 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             .toList().forEach {
                 return it
             }
-        return null
+        throw NoSuchPayaraMicroJarFileException()
     }
 
     /**
@@ -76,7 +77,7 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             task.apply {
                 group = groupId
                 doLast {
-                    val payaraMicroJarFile = project.getPayaraMicroJar()!!
+                    val payaraMicroJarFile = project.getPayaraMicroJar()
                     val result = PayaraMicroVersion.get(
                         javaBin = javaBin,
                         payaraMicroJarFile = payaraMicroJarFile
@@ -87,4 +88,6 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
         }
 
     }
+
+    class NoSuchPayaraMicroJarFileException(override val message: String? = null) : Exception()
 }
