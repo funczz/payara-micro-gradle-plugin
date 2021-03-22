@@ -16,6 +16,14 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
     private val kotlinPluginsBlock = """
         plugins {
             id("payara-micro-gradle-plugin")
+            id("java")
+        }
+        repositories {
+            mavenLocal()
+            mavenCentral()
+        }
+        dependencies {
+            testImplementation("fish.payara.extras:payara-micro:5.2021.1")
         }
         """.trimIndent()
 
@@ -34,12 +42,12 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
                 withPluginClasspath()
                 withDebug(true)
                 forwardOutput()
-                withArguments("example")
+                withArguments("payaraVersion")
             }
             val result = runner.build()
 
             // Verify the result
-            result.output shouldContain "hello world."
+            result.output shouldContain ""
         }
     }
 }

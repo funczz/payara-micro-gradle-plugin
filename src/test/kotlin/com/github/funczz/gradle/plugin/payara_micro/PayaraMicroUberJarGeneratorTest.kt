@@ -34,11 +34,6 @@ class PayaraMicroUberJarGeneratorTest : StringSpec() {
                 payaraMicroJarFile = payara,
                 workDir = buildDir,
             ).outputUberJar(rootWar = war, uberJar = jar)
-            val start = System.currentTimeMillis()
-            while (!jar.exists()) {
-                Thread.sleep(100L)
-                if (System.currentTimeMillis() - start > 5000L) break
-            }
             jar.exists() shouldBe true
         }
 

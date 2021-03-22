@@ -2,17 +2,30 @@ package com.github.funczz.gradle.plugin.payara_micro
 
 /**
  * PluginExtension
+ * @author funczz
  */
 open class PayaraMicroGradlePluginExtension {
-    var value: String = ""
+    /**
+     * Java ランタイム起動コマンド
+     * javaコマンドにパスが通っている場合はブランクのままで良い
+     */
+    var javaBin = ""
+
+    /**
+     * payara Micro コマンドライン オプション
+     * 追加のオプションをリストで定義する
+     */
+    var options: List<String> = listOf()
 }
 
 /**
  * build.gradle.kts:
  *
- * example { value = "hello world." }
- *
+ * payaraMicro {
+ *     javaBin = "/opt/java/bin/java"
+ *     options = listOf()
+ * }
  */
-fun org.gradle.api.Project.example(configure: PayaraMicroGradlePluginExtension.() -> Unit) {
+fun org.gradle.api.Project.payaraMicro(configure: PayaraMicroGradlePluginExtension.() -> Unit) {
     this.convention.configure(PayaraMicroGradlePluginExtension::class.java, configure)
 }

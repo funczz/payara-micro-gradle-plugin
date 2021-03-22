@@ -5,28 +5,82 @@ package com.github.funczz.gradle.plugin.payara_micro
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import java.io.File
 
 /**
  * Plugin
  */
 class PayaraMicroGradlePlugin : Plugin<Project> {
 
+    private val groupId = "payara micro"
+
+    /**
+     * プロジェクトのクラスパスから payaraMicroJar を取得する
+     * @return payaraMicroJar の File オブジェクト。未検出は null
+     */
+    private fun Project.getPayaraMicroJar(): File? {
+        val regex = """fish\.payara\.extras.payara-micro.+payara-micro-.*\.jar$""".toRegex()
+        this.configurations
+            .asSequence()
+            .filter {
+                it.toString().contains("""Classpath""".toRegex())
+            }.map {
+                it.files
+            }.flatten()
+            .filter {
+                it.isFile
+            }.filter {
+                it.canonicalPath.contains(regex)
+            }
+            .toList().forEach {
+                return it
+            }
+        return null
+    }
+
+    /**
+     * プロジェクトの成果物を取得する
+     * @return 成果物の File オブジェクト
+     */
+    private fun Project.getArchiveFile(): File {
+        return this.configurations.findByName("archives")!!.allArtifacts.files.singleFile
+    }
+
+    /**
+     * UberJar 用の新規ファイルを取得する
+     * @return 新規 File オブジェクト
+     */
+    private fun Project.getUberJarFile(): File {
+        val archiveFile = this.getArchiveFile()
+        return File(archiveFile.parentFile, archiveFile.nameWithoutExtension + ".jar")
+    }
+
+    /**
+     * War 展開用ディレクトリ $buildDir/payara_micro/ROOT.war/
+     * @return ROOT.war/ File オブジェクト
+     */
+    private fun Project.getIntoDirectory(): File {
+        return File(File(this.buildDir, "payara_micro"), "ROOT.war")
+    }
+
     override fun apply(project: Project) {
 
-        val extension = project.extensions.create("PayaraMicroGradlePluginExtension", PayaraMicroGradlePluginExtension::class.java)
+        val extension = project.extensions.create(
+            "PayaraMicroGradlePluginExtension",
+            PayaraMicroGradlePluginExtension::class.java
+        )
 
-        project.tasks.register("example") { task ->
+        val javaBin = if (extension.javaBin.isNotBlank()) extension.javaBin else "java"
+
+        project.tasks.register("payaraVersion") { task ->
             task.apply {
-                group = "example plugin"
-                //dependsOn("war")
-
-                doFirst {
-                }
+                group = groupId
                 doLast {
-                    val result = when(extension.value.isBlank()) {
-                        true -> "hello world."
-                        else -> extension.value
-                    }
+                    val payaraMicroJarFile = project.getPayaraMicroJar()!!
+                    val result = PayaraMicroVersion.get(
+                        javaBin = javaBin,
+                        payaraMicroJarFile = payaraMicroJarFile
+                    )
                     println(result)
                 }
             }
