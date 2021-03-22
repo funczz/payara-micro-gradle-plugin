@@ -113,8 +113,7 @@ tasks.withType(Test::class.java) {
  * dependencies
  */
 dependencies {
-    //payara-micro
-    testImplementation("fish.payara.extras:payara-micro:5.2021.1")
+    testRuntimeOnly("fish.payara.extras:payara-micro:5.2021.1")
 }
 
 /**

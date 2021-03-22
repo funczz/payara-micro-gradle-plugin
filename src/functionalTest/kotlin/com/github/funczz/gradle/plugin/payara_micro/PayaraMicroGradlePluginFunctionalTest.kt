@@ -23,7 +23,7 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
             mavenCentral()
         }
         dependencies {
-            testImplementation("fish.payara.extras:payara-micro:5.2021.1")
+            testRuntimeOnly("fish.payara.extras:payara-micro:5.2021.1")
         }
         """.trimIndent()
 

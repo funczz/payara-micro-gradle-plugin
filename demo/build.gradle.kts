@@ -44,11 +44,7 @@ kotlinProjectDependencies()
  * dependencies
  */
 dependencies {
-    "testImplementation"("fish.payara.extras:payara-micro:5.2021.1")
-    "javax.servlet:javax.servlet-api:3.1.0".let {
-        "compileOnly"(it)
-        "testRuntimeOnly"(it)
-    }
+    "testRuntimeOnly"("fish.payara.extras:payara-micro:5.2021.1")
 }
 
 /**
