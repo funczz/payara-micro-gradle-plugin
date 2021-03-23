@@ -10,6 +10,11 @@ import java.util.concurrent.TimeoutException
 object PayaraMicroVersion {
 
     /**
+     * デフォルトのプロセス起動の制限時間
+     */
+    private const val DEFAULT_TIMEOUT = 60_000L
+
+    /**
      * デフォルトのJava ランタイム起動コマンド
      */
     private const val DEFAULT_JAVA_BIN = "java"
@@ -21,7 +26,7 @@ object PayaraMicroVersion {
      * @return バージョン番号
      * @throws TimeoutException コマンドが制限時間内に完了しなかった
      */
-    fun get(payaraMicroJarFile: File, timeout: Long = 5000L): String {
+    fun get(payaraMicroJarFile: File, timeout: Long = DEFAULT_TIMEOUT): String {
         return get(javaBin = DEFAULT_JAVA_BIN, payaraMicroJarFile = payaraMicroJarFile, timeout = timeout)
     }
 

@@ -129,6 +129,6 @@ class PayaraMicroUberJarGenerator(
         /**
          * デフォルトのプロセス起動の制限時間
          */
-        private const val DEFAULT_TIMEOUT = 5000L
+        private const val DEFAULT_TIMEOUT = 60_000L
     }
 }

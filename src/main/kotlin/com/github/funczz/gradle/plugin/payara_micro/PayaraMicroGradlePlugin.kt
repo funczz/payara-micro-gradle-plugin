@@ -45,7 +45,7 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
      * @return 成果物の File オブジェクト
      * @throws NoSuchArchiveFileException 成果物が未検出
      */
-    private fun Project.getArchiveFile(timeout: Long = 10000L): File {
+    private fun Project.getArchiveFile(timeout: Long = DEFAULT_TIMEOUT): File {
         val file = this.configurations.findByName("archives")!!.allArtifacts.files.singleFile
         var count = 0L
         while (!file.exists()) {
@@ -85,6 +85,21 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
 
         val javaBin = if (extension.javaBin.isNotBlank()) extension.javaBin else "java"
 
+        val archiveTimeout = when (extension.archiveTimeout >= 0L) {
+            true -> extension.archiveTimeout
+            else -> DEFAULT_TIMEOUT
+        }
+
+        val uberJarTimeout = when (extension.uberJarTimeout >= 0L) {
+            true -> extension.uberJarTimeout
+            else -> DEFAULT_TIMEOUT
+        }
+
+        val versionTimeout = when (extension.versionTimeout >= 0L) {
+            true -> extension.versionTimeout
+            else -> DEFAULT_TIMEOUT
+        }
+
         project.tasks.register("payaraVersion") { task ->
             task.apply {
                 group = groupId
@@ -92,7 +107,8 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
                     val payaraMicroJarFile = project.getPayaraMicroJar()
                     val result = PayaraMicroVersion.get(
                         javaBin = javaBin,
-                        payaraMicroJarFile = payaraMicroJarFile
+                        payaraMicroJarFile = payaraMicroJarFile,
+                        timeout = versionTimeout,
                     )
                     println(result)
                 }
@@ -105,12 +121,13 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
                 dependsOn("war")
                 doLast {
                     val payaraMicroJarFile = project.getPayaraMicroJar()
-                    val rootWar = project.getArchiveFile()
+                    val rootWar = project.getArchiveFile(timeout = archiveTimeout)
                     val uberJar = project.getUberJarFile()
                     PayaraMicroUberJarGenerator(
                         payaraMicroJarFile = payaraMicroJarFile,
                         workDir = project.buildDir,
                         javaBin = javaBin,
+                        timeout = uberJarTimeout,
                     ).outputUberJar(
                         rootWar = rootWar,
                         uberJar = uberJar,
@@ -131,4 +148,11 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
      * 成果物 ファイル未検出エラー
      */
     class NoSuchArchiveFileException(override val message: String? = null) : Exception()
+
+    companion object {
+        /**
+         * 制限時間のデフォルト値
+         */
+        private const val DEFAULT_TIMEOUT = 60_000L
+    }
 }
