@@ -46,6 +46,10 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
 
     init {
 
+        /**
+         * payaraVersion
+         */
+
         "payaraVersion タスクが登録されている" {
             // Run the build
             val runner = createGradleRunner(arguments = "tasks")
@@ -60,6 +64,18 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
             val result = runner.build()
             // Verify the result
             result.output shouldContain "Payara Micro "
+        }
+
+        /**
+         * payaraUberJar
+         */
+
+        "payaraUberJar タスクが登録されている" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "tasks")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "payaraUberJar"
         }
 
     }

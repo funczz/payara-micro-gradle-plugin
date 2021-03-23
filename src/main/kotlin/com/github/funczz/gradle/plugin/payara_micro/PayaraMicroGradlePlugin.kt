@@ -41,10 +41,22 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
 
     /**
      * プロジェクトの成果物を取得する
+     * @param timeout 検出処理の制限時間(ミリ秒)
      * @return 成果物の File オブジェクト
+     * @throws NoSuchArchiveFileException 成果物が未検出
      */
-    private fun Project.getArchiveFile(): File {
-        return this.configurations.findByName("archives")!!.allArtifacts.files.singleFile
+    private fun Project.getArchiveFile(timeout: Long = 10000L): File {
+        val file = this.configurations.findByName("archives")!!.allArtifacts.files.singleFile
+        var count = 0L
+        while (!file.exists()) {
+            if (count >= timeout) break
+            Thread.sleep(1L)
+            count++
+        }
+        return when (file.exists()) {
+            true -> file
+            else -> throw NoSuchArchiveFileException()
+        }
     }
 
     /**
@@ -87,7 +99,36 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             }
         }
 
+        project.tasks.register("payaraUberJar") { task ->
+            task.apply {
+                group = groupId
+                dependsOn("war")
+                doLast {
+                    val payaraMicroJarFile = project.getPayaraMicroJar()
+                    val rootWar = project.getArchiveFile()
+                    val uberJar = project.getUberJarFile()
+                    PayaraMicroUberJarGenerator(
+                        payaraMicroJarFile = payaraMicroJarFile,
+                        workDir = project.buildDir,
+                        javaBin = javaBin,
+                    ).outputUberJar(
+                        rootWar = rootWar,
+                        uberJar = uberJar,
+                        options = extension.options
+                    )
+                    println("Built Uber Jar ${uberJar.name}")
+                }
+            }
+        }
     }
 
+    /**
+     * PayaraMicro Jar ファイル未検出エラー
+     */
     class NoSuchPayaraMicroJarFileException(override val message: String? = null) : Exception()
+
+    /**
+     * 成果物 ファイル未検出エラー
+     */
+    class NoSuchArchiveFileException(override val message: String? = null) : Exception()
 }
