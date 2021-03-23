@@ -5,32 +5,154 @@ package com.github.funczz.gradle.plugin.payara_micro
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import java.io.File
 
 /**
  * Plugin
  */
 class PayaraMicroGradlePlugin : Plugin<Project> {
 
+    private val groupId = "payara micro"
+
+    /**
+     * プロジェクトのクラスパスから payaraMicroJar を取得する
+     * @return payaraMicroJar の File オブジェクト
+     * @throws NoSuchPayaraMicroJarFileException payaraMicroJar 未検出
+     */
+    private fun Project.getPayaraMicroJar(): File {
+        val regex = """fish\.payara\.extras.payara-micro.+payara-micro-.*\.jar$""".toRegex()
+        this.configurations
+            .asSequence()
+            .filter {
+                it.toString().contains("""Classpath""".toRegex())
+            }.map {
+                it.files
+            }.flatten()
+            .filter {
+                it.isFile
+            }.filter {
+                it.canonicalPath.contains(regex)
+            }
+            .toList().forEach {
+                return it
+            }
+        throw NoSuchPayaraMicroJarFileException()
+    }
+
+    /**
+     * プロジェクトの成果物を取得する
+     * @param timeout 検出処理の制限時間(ミリ秒)
+     * @return 成果物の File オブジェクト
+     * @throws NoSuchArchiveFileException 成果物が未検出
+     */
+    private fun Project.getArchiveFile(timeout: Long = DEFAULT_TIMEOUT): File {
+        val file = this.configurations.findByName("archives")!!.allArtifacts.files.singleFile
+        var count = 0L
+        while (!file.exists()) {
+            if (count >= timeout) break
+            Thread.sleep(1L)
+            count++
+        }
+        return when (file.exists()) {
+            true -> file
+            else -> throw NoSuchArchiveFileException()
+        }
+    }
+
+    /**
+     * UberJar 用の新規ファイルを取得する
+     * @return 新規 File オブジェクト
+     */
+    private fun Project.getUberJarFile(): File {
+        val archiveFile = this.getArchiveFile()
+        return File(archiveFile.parentFile, archiveFile.nameWithoutExtension + ".jar")
+    }
+
+    /**
+     * War 展開用ディレクトリ $buildDir/payara_micro/ROOT.war/
+     * @return ROOT.war/ File オブジェクト
+     */
+    private fun Project.getIntoDirectory(): File {
+        return File(File(this.buildDir, "payara_micro"), "ROOT.war")
+    }
+
     override fun apply(project: Project) {
 
-        val extension = project.extensions.create("PayaraMicroGradlePluginExtension", PayaraMicroGradlePluginExtension::class.java)
+        val extension = project.extensions.create(
+            "PayaraMicroGradlePluginExtension",
+            PayaraMicroGradlePluginExtension::class.java
+        )
 
-        project.tasks.register("example") { task ->
+        val javaBin = if (extension.javaBin.isNotBlank()) extension.javaBin else "java"
+
+        val archiveTimeout = when (extension.archiveTimeout >= 0L) {
+            true -> extension.archiveTimeout
+            else -> DEFAULT_TIMEOUT
+        }
+
+        val uberJarTimeout = when (extension.uberJarTimeout >= 0L) {
+            true -> extension.uberJarTimeout
+            else -> DEFAULT_TIMEOUT
+        }
+
+        val versionTimeout = when (extension.versionTimeout >= 0L) {
+            true -> extension.versionTimeout
+            else -> DEFAULT_TIMEOUT
+        }
+
+        project.tasks.register("payaraVersion") { task ->
             task.apply {
-                group = "example plugin"
-                //dependsOn("war")
-
-                doFirst {
-                }
+                group = groupId
                 doLast {
-                    val result = when(extension.value.isBlank()) {
-                        true -> "hello world."
-                        else -> extension.value
-                    }
+                    val payaraMicroJarFile = project.getPayaraMicroJar()
+                    val result = PayaraMicroVersion.get(
+                        javaBin = javaBin,
+                        payaraMicroJarFile = payaraMicroJarFile,
+                        timeout = versionTimeout,
+                    )
                     println(result)
                 }
             }
         }
 
+        project.tasks.register("payaraUberJar") { task ->
+            task.apply {
+                group = groupId
+                dependsOn("war")
+                doLast {
+                    val payaraMicroJarFile = project.getPayaraMicroJar()
+                    val rootWar = project.getArchiveFile(timeout = archiveTimeout)
+                    val uberJar = project.getUberJarFile()
+                    PayaraMicroUberJarGenerator(
+                        payaraMicroJarFile = payaraMicroJarFile,
+                        workDir = project.buildDir,
+                        javaBin = javaBin,
+                        timeout = uberJarTimeout,
+                    ).outputUberJar(
+                        rootWar = rootWar,
+                        uberJar = uberJar,
+                        options = extension.options
+                    )
+                    println("Built Uber Jar ${uberJar.name}")
+                }
+            }
+        }
+    }
+
+    /**
+     * PayaraMicro Jar ファイル未検出エラー
+     */
+    class NoSuchPayaraMicroJarFileException(override val message: String? = null) : Exception()
+
+    /**
+     * 成果物 ファイル未検出エラー
+     */
+    class NoSuchArchiveFileException(override val message: String? = null) : Exception()
+
+    companion object {
+        /**
+         * 制限時間のデフォルト値
+         */
+        private const val DEFAULT_TIMEOUT = 60_000L
     }
 }

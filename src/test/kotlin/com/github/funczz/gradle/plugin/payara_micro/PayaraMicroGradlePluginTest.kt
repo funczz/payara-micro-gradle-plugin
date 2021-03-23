@@ -17,7 +17,7 @@ class PayaraMicroGradlePluginTest : StringSpec() {
             project.plugins.apply("payara-micro-gradle-plugin")
 
             // Verify the result
-            project.tasks.findByName("example").toString() shouldBe "task ':example'"
+            project.tasks.findByName("payaraVersion").toString() shouldBe "task ':payaraVersion'"
         }
     }
 

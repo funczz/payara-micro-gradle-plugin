@@ -40,22 +40,9 @@ publishing {
 }
 
 /**
- * allprojects
+ * build script
  */
-allprojects {
-    /**
-     * build script
-     */
-    buildscript {
-        /**
-         * repositories
-         */
-        repositories {
-            mavenLocal()
-            mavenCentral()
-        }
-    }
-
+buildscript {
     /**
      * repositories
      */
@@ -63,55 +50,71 @@ allprojects {
         mavenLocal()
         mavenCentral()
     }
+}
 
-    /**
-     * plugins
-     */
-    apply(plugin = "java")
-    apply(plugin = "org.jetbrains.kotlin.jvm")
-    apply(plugin = "jacoco")
+/**
+ * repositories
+ */
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
 
-    /**
-     * dependencies: kotlin
-     */
-    kotlinProjectDependencies()
+/**
+ * plugins
+ */
+apply(plugin = "java")
+apply(plugin = "org.jetbrains.kotlin.jvm")
+apply(plugin = "jacoco")
 
-    /**
-     * task: JavaCompile
-     */
-    org.gradle.api.Action<org.gradle.api.plugins.JavaPluginExtension> {
-        sourceCompatibility = CommonDeps.Java.version
-        targetCompatibility = CommonDeps.Java.version
-    }
-    tasks.withType(JavaCompile::class) {
-        options.encoding = CommonDeps.Java.encoding
-    }
+/**
+ * dependencies: kotlin
+ */
+kotlinProjectDependencies()
 
-    /**
-     * task: KotlinCompile
-     */
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = CommonDeps.Kotlin.jvmTarget
-            freeCompilerArgs = CommonDeps.Kotlin.freeCompilerArgs
-        }
-    }
+/**
+ * task: JavaCompile
+ */
+org.gradle.api.Action<org.gradle.api.plugins.JavaPluginExtension> {
+    sourceCompatibility = CommonDeps.Java.version
+    targetCompatibility = CommonDeps.Java.version
+}
+tasks.withType(JavaCompile::class) {
+    options.encoding = CommonDeps.Java.encoding
+}
 
-    /**
-     * task: Test
-     */
-    tasks.withType(Test::class.java) {
-        useJUnitPlatform() //task: kotlintest-runner-junit5
-        testLogging {
-            events(*CommonTasks.Test.loggingEvent)
-        }
+/**
+ * task: KotlinCompile
+ */
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = CommonDeps.Kotlin.jvmTarget
+        freeCompilerArgs = CommonDeps.Kotlin.freeCompilerArgs
     }
 }
+
+/**
+ * task: Test
+ */
+tasks.withType(Test::class.java) {
+    useJUnitPlatform() //task: kotlintest-runner-junit5
+    testLogging {
+        events(*CommonTasks.Test.loggingEvent)
+    }
+}
+
 
 /**
  * rootProject
  * ===========
  */
+
+/**
+ * dependencies
+ */
+dependencies {
+    testRuntimeOnly("fish.payara.extras:payara-micro:5.2021.1")
+}
 
 /**
  * plugin: java-gradle-plugin
@@ -136,9 +139,48 @@ val functionalTest by tasks.creating(Test::class) {
     group = "verification"
     testClassesDirs = functionalTestSourceSet.output.classesDirs
     classpath = functionalTestSourceSet.runtimeClasspath
+    useJUnitPlatform() //task: kotlintest-runner-junit5
 }
 
 val check by tasks.getting(Task::class) {
     // Run the functional tests as part of `check`
     dependsOn(functionalTest)
 }
+
+/**
+ * task: test
+ * deploy PayaraMicro Jar
+ */
+fun Project.getPayaraMicroJar(): File? {
+    val regex = """fish\.payara\.extras.payara-micro.+payara-micro-.*\.jar$""".toRegex()
+    this.configurations
+        .asSequence()
+        .filter {
+            it.toString().contains("""Classpath""".toRegex())
+        }.map {
+            it.files
+        }.flatten()
+        .filter {
+            it.isFile
+        }.filter {
+            it.canonicalPath.contains(regex)
+        }
+        .toList().forEach {
+            return it
+        }
+    return null
+}
+
+tasks.test {
+    useJUnitPlatform() //task: kotlintest-runner-junit5
+    doFirst {
+        val payaraMicroJar = project.getPayaraMicroJar()!!
+        val testJar = File(buildDir, "payara-micro.jar")
+        if (!testJar.exists()) {
+            payaraMicroJar.also {
+                it.copyTo(testJar, overwrite = true)
+            }
+        }
+    }
+}
+

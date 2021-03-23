@@ -13,33 +13,70 @@ import java.io.File
  */
 class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
 
-    private val kotlinPluginsBlock = """
+    // build.gradle.kts
+    private val kotlinBuildGradle = """
         plugins {
             id("payara-micro-gradle-plugin")
+            id("java")
+        }
+        repositories {
+            mavenLocal()
+            mavenCentral()
+        }
+        dependencies {
+            testRuntimeOnly("fish.payara.extras:payara-micro:5.2021.1")
         }
         """.trimIndent()
 
+    // Setup the test build
+    private fun createGradleRunner(arguments: String): GradleRunner {
+        val projectDir = File("build/functionalTest").apply {
+            mkdirs()
+            resolve("settings.gradle.kts").writeText("")
+            resolve("build.gradle.kts").writeText(kotlinBuildGradle)
+        }
+        return GradleRunner.create().apply {
+            withProjectDir(projectDir)
+            withPluginClasspath()
+            withDebug(true)
+            forwardOutput()
+            withArguments(arguments)
+        }
+    }
+
     init {
 
-        "can run task using Kotlin-DSL" {
-            // Setup the test build
-            val projectDir = File("build/functionalTest")
-            projectDir.mkdirs()
-            projectDir.resolve("settings.gradle.kts").writeText("")
-            projectDir.resolve("build.gradle.kts").writeText(kotlinPluginsBlock)
+        /**
+         * payaraVersion
+         */
 
+        "payaraVersion タスクが登録されている" {
             // Run the build
-            val runner = GradleRunner.create().apply {
-                withProjectDir(projectDir)
-                withPluginClasspath()
-                withDebug(true)
-                forwardOutput()
-                withArguments("example")
-            }
+            val runner = createGradleRunner(arguments = "tasks")
             val result = runner.build()
-
             // Verify the result
-            result.output shouldContain "hello world."
+            result.output shouldContain "payaraVersion"
         }
+
+        "payaraVersion タスクを実行してバージョン情報を取得する" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "payaraVersion")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "Payara Micro "
+        }
+
+        /**
+         * payaraUberJar
+         */
+
+        "payaraUberJar タスクが登録されている" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "tasks")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "payaraUberJar"
+        }
+
     }
 }
