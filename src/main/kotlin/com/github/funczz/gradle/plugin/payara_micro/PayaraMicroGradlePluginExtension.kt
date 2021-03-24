@@ -74,7 +74,6 @@ open class PayaraMicroGradlePluginExtension {
  *     processPeriod = 1_000L
  *     processTimeout = -1L
  *     processCharset = Charset.defaultCharset()
- *
  * }
  */
 fun org.gradle.api.Project.payaraMicro(configure: PayaraMicroGradlePluginExtension.() -> Unit) {

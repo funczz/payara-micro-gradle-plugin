@@ -23,7 +23,7 @@ object PayaraMicroVersion {
      * payara Micro Jar のバージョンを取得する
      * @param payaraMicroJarFile payara Micro Jar ファイル
      * @param timeout プロセス起動の制限時間
-     * @return バージョン番号
+     * @return バージョン情報
      * @throws TimeoutException コマンドが制限時間内に完了しなかった
      */
     fun get(payaraMicroJarFile: File, timeout: Long = DEFAULT_TIMEOUT): String {
@@ -35,7 +35,7 @@ object PayaraMicroVersion {
      * @param javaBin Java ランタイム起動コマンド
      * @param payaraMicroJarFile payara Micro Jar ファイル
      * @param timeout プロセス起動の制限時間
-     * @return バージョン番号
+     * @return バージョン情報
      * @throws TimeoutException コマンドが制限時間内に完了しなかった
      */
     fun get(javaBin: String, payaraMicroJarFile: File, timeout: Long = 5000L): String {

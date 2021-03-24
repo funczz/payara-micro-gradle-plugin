@@ -100,6 +100,7 @@ class PayaraMicroProcess(
 
     /**
      * プロセスの標準出力を処理する関数を代入
+     * @param function 標準出力を処理する関数
      */
     fun eachStdout(function: (String) -> Unit) {
         eachStdout = function
@@ -107,6 +108,7 @@ class PayaraMicroProcess(
 
     /**
      * プロセスのエラー出力を処理する関数を代入
+     * @param function エラー出力を処理する関数
      */
     fun eachStderr(function: (String) -> Unit) {
         eachStderr = function
@@ -114,6 +116,7 @@ class PayaraMicroProcess(
 
     /**
      * プロセスの例外エラーを処理する関数を代入
+     * @param function 例外エラーを処理する関数
      */
     fun onError(function: (Throwable) -> Unit) {
         onError = function
@@ -205,6 +208,7 @@ class PayaraMicroProcess(
 
     /**
      * ディレクトリを作成する
+     * @param directory ディレクトリの File オブジェクト
      */
     private fun createDirectory(directory: File) {
         val canonicalDirectory = directory.canonicalFile
@@ -218,6 +222,8 @@ class PayaraMicroProcess(
 
     /**
      * ディレクトリから、例外を除くファイルを削除する
+     * @param directory ディレクトリの File オブジェクト
+     * @param exclude 除外対象の File オブジェクトを要素としたリスト
      */
     private fun cleanDirectory(directory: File, exclude: List<File> = listOf()) {
         val excludeCanonicalFile = exclude.map { it.canonicalFile }
@@ -234,6 +240,8 @@ class PayaraMicroProcess(
 
     /**
      * Jar ファイルを展開する
+     *  @param jarFile Jar の File オブジェクト
+     *  @param intoDirectory Jar 展開先のディレクトリ
      */
     private fun extractJarFile(jarFile: JarFile, intoDirectory: File) {
         jarFile.entries().iterator().forEach {

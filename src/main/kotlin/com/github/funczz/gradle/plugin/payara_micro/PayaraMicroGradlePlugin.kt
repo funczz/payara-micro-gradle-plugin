@@ -9,9 +9,13 @@ import java.io.File
 
 /**
  * Plugin
+ * @author funczz
  */
 class PayaraMicroGradlePlugin : Plugin<Project> {
 
+    /**
+     * タスク グループ
+     */
     private val groupId = "payara micro"
 
     /**
