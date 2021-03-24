@@ -29,7 +29,7 @@ class ProcessStreamGobblerTest : StringSpec() {
                 it.onError {
                     throw it
                 }
-                it.onWaitFor {
+                it.waitFor {
                     it.waitFor()
                 }
             }
@@ -51,7 +51,7 @@ class ProcessStreamGobblerTest : StringSpec() {
                 it.onError {
                     throw it
                 }
-                it.onWaitFor {
+                it.waitFor {
                     it.waitFor()
                 }
             }
@@ -70,7 +70,7 @@ class ProcessStreamGobblerTest : StringSpec() {
                 it.onError {
                     result = it
                 }
-                it.onWaitFor {
+                it.waitFor {
                     it.waitFor()
                 }
             }
@@ -81,12 +81,12 @@ class ProcessStreamGobblerTest : StringSpec() {
             result!!.message shouldStartWith """Cannot run program "ls not_exists_file""""
         }
 
-        "onWaitFor" {
+        "waitFor" {
             var result = ""
 
             val pb = ProcessBuilder().command(loop.path)
             val psg = ProcessStreamGobbler().also {
-                it.onWaitFor {
+                it.waitFor {
                     Thread.sleep(1000L)
                     it.destroy()
                     result = "destroy"

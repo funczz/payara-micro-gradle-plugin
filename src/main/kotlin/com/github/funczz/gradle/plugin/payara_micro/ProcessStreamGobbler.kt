@@ -12,7 +12,7 @@ open class ProcessStreamGobbler {
 
     open var onError: (Throwable) -> Unit = {}
 
-    open var onWaitFor: (Process) -> Unit = {
+    open var waitFor: (Process) -> Unit = {
         it.waitFor()
     }
 
@@ -28,8 +28,8 @@ open class ProcessStreamGobbler {
         onError = function
     }
 
-    open fun onWaitFor(function: (Process) -> Unit) {
-        onWaitFor = function
+    open fun waitFor(function: (Process) -> Unit) {
+        waitFor = function
     }
 
     open fun start(
@@ -44,7 +44,7 @@ open class ProcessStreamGobbler {
             process.errorStream.gobblerThread(charset) {
                 eachStderr(it)
             }.start()
-            onWaitFor(process)
+            waitFor(process)
         } catch (e: Throwable) {
             onError(e)
         }

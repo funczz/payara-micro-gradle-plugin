@@ -74,7 +74,7 @@ class PayaraMicroProcess(
     /**
      * プロセスの待機処理
      */
-    private val onWaitFor: (Process) -> Unit = {
+    private val waitFor: (Process) -> Unit = {
         val start = System.currentTimeMillis()
         loop@ while (true) {
             if (!reloadFile.exists()) {
@@ -133,7 +133,7 @@ class PayaraMicroProcess(
             it.eachStdout = eachStdout
             it.eachStderr = eachStderr
             it.onError = onError
-            it.onWaitFor = onWaitFor
+            it.waitFor = waitFor
         }.start(charset = charset) { pb.start() }
     }
 

@@ -57,7 +57,7 @@ object PayaraMicroVersion {
             onError {
                 throw it
             }
-            onWaitFor {
+            waitFor {
                 while (it.isAlive) {
                     if (count >= timeout) break
                     Thread.sleep(1L)
