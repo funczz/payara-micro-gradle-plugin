@@ -78,5 +78,41 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
             result.output shouldContain "payaraUberJar"
         }
 
+        /**
+         * payaraStartWar
+         */
+
+        "payaraStartWar タスクが登録されている" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "tasks")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "payaraStartWar"
+        }
+
+        /**
+         * payaraRedeployWar
+         */
+
+        "payaraRedeployWar タスクが登録されている" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "tasks")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "payaraRedeployWar"
+        }
+
+        /**
+         * payaraStopWar
+         */
+
+        "payaraStopWar タスクが登録されている" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "tasks")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "payaraStopWar"
+        }
+
     }
 }

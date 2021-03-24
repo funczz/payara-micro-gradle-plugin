@@ -100,14 +100,53 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             else -> DEFAULT_TIMEOUT
         }
 
+        val payaraMicroJar: () -> File = {
+            project.getPayaraMicroJar()
+        }
+
+        val rootWar: () -> File = {
+            project.getArchiveFile(timeout = archiveTimeout)
+        }
+
+        val uberJar: () -> File = {
+            project.getUberJarFile()
+        }
+
+        val rootDir: () -> File = {
+            project.getIntoDirectory()
+        }
+
+        val pm: () -> PayaraMicroProcess = {
+            PayaraMicroProcess(
+                payaraMicroJarFile = payaraMicroJar(),
+                rootWar = rootWar(),
+                rootDir = rootDir(),
+                options = extension.options,
+                initialDelay = extension.processInitialDelay,
+                period = extension.processPeriod,
+                timeout = extension.processTimeout,
+                charset = extension.processCharset,
+                javaBin = javaBin,
+            ).also { p ->
+                p.eachStdout { s ->
+                    println("stdout: $s")
+                }
+                p.eachStderr { s ->
+                    println("stderr: $s")
+                }
+                p.onError { e ->
+                    throw e
+                }
+            }
+        }
+
         project.tasks.register("payaraVersion") { task ->
             task.apply {
                 group = groupId
                 doLast {
-                    val payaraMicroJarFile = project.getPayaraMicroJar()
                     val result = PayaraMicroVersion.get(
                         javaBin = javaBin,
-                        payaraMicroJarFile = payaraMicroJarFile,
+                        payaraMicroJarFile = payaraMicroJar(),
                         timeout = versionTimeout,
                     )
                     println(result)
@@ -120,20 +159,54 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
                 group = groupId
                 dependsOn("war")
                 doLast {
-                    val payaraMicroJarFile = project.getPayaraMicroJar()
-                    val rootWar = project.getArchiveFile(timeout = archiveTimeout)
-                    val uberJar = project.getUberJarFile()
+                    val uberJarFile = uberJar()
                     PayaraMicroUberJarGenerator(
-                        payaraMicroJarFile = payaraMicroJarFile,
+                        payaraMicroJarFile = payaraMicroJar(),
                         workDir = project.buildDir,
                         javaBin = javaBin,
                         timeout = uberJarTimeout,
                     ).outputUberJar(
-                        rootWar = rootWar,
-                        uberJar = uberJar,
+                        rootWar = rootWar(),
+                        uberJar = uberJarFile,
                         options = extension.options
                     )
-                    println("Built Uber Jar ${uberJar.name}")
+                    println("Built Uber Jar ${uberJarFile.name}")
+                }
+            }
+        }
+
+        project.tasks.register("payaraStartWar") { task ->
+            task.apply {
+                group = groupId
+                dependsOn("war")
+                doLast {
+                    println("deploy war: ${rootWar().canonicalPath}")
+                    println("deploy dir: ${rootDir().canonicalPath}")
+                    pm().payaraStartWar()
+                }
+            }
+        }
+
+        project.tasks.register("payaraRedeployWar") { task ->
+            task.apply {
+                group = groupId
+                dependsOn("war")
+                doLast {
+                    println("deploy war: ${rootWar().canonicalPath}")
+                    println("deploy dir: ${rootDir().canonicalPath}")
+                    pm().payaraRedeployWar()
+                }
+            }
+        }
+
+        project.tasks.register("payaraStopWar") { task ->
+            task.apply {
+                group = groupId
+                //dependsOn("war")
+                doLast {
+                    println("deploy war: ${rootWar().canonicalPath}")
+                    println("deploy dir: ${rootDir().canonicalPath}")
+                    pm().payaraStopWar()
                 }
             }
         }

@@ -1,9 +1,18 @@
+import com.github.funczz.gradle.plugin.payara_micro.payaraMicro
+
 /**
  * plugins
  */
 plugins {
     id("payara-micro-gradle-plugin")
     kotlin("jvm") version "1.4.30" apply false
+}
+
+/**
+ * plugin: payara-micro-gradle-plugin
+ */
+payaraMicro {
+    javaBin = "java"
 }
 
 /**

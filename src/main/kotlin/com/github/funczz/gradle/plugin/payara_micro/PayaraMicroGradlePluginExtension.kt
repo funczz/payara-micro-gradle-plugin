@@ -1,5 +1,10 @@
 package com.github.funczz.gradle.plugin.payara_micro
 
+import com.github.funczz.gradle.plugin.payara_micro.PayaraMicroProcess.Companion.DEFAULT_CHARSET
+import com.github.funczz.gradle.plugin.payara_micro.PayaraMicroProcess.Companion.DEFAULT_INITIAL_DELAY
+import com.github.funczz.gradle.plugin.payara_micro.PayaraMicroProcess.Companion.DEFAULT_PERIOD
+import com.github.funczz.gradle.plugin.payara_micro.PayaraMicroProcess.Companion.DEFAULT_TIMEOUT
+
 /**
  * PluginExtension
  * @author funczz
@@ -34,6 +39,26 @@ open class PayaraMicroGradlePluginExtension {
      * 0 未満を指定時はデフォルト値
      */
     var versionTimeout = -1L
+
+    /**
+     * payara Micro プロセス起動前の遅延時間（ミリ秒)
+     */
+    var processInitialDelay = DEFAULT_INITIAL_DELAY
+
+    /**
+     * payara Micro プロセス起動に制限時間を設けた際の、プロセス確認の間隔（ミリ秒)
+     */
+    var processPeriod = DEFAULT_PERIOD
+
+    /**
+     * payara Micro プロセス起動の制限時間（ミリ秒)
+     */
+    var processTimeout = DEFAULT_TIMEOUT
+
+    /**
+     * payara Micro プロセス標準出力、エラー出力の文字セット
+     */
+    var processCharset = DEFAULT_CHARSET
 }
 
 /**
@@ -45,6 +70,11 @@ open class PayaraMicroGradlePluginExtension {
  *     archiveTimeout = 60_000L
  *     uberJarTimeout = 60_000L
  *     versionTimeout = 60_000L
+ *     processInitialDelay = 3_000L
+ *     processPeriod = 1_000L
+ *     processTimeout = -1L
+ *     processCharset = Charset.defaultCharset()
+ *
  * }
  */
 fun org.gradle.api.Project.payaraMicro(configure: PayaraMicroGradlePluginExtension.() -> Unit) {
