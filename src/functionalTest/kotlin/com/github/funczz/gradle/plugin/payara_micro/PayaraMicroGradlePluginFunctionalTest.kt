@@ -47,6 +47,18 @@ class PayaraMicroGradlePluginFunctionalTest : StringSpec() {
     init {
 
         /**
+         * javaVersion
+         */
+
+        "javaVersion タスクが登録されている" {
+            // Run the build
+            val runner = createGradleRunner(arguments = "tasks")
+            val result = runner.build()
+            // Verify the result
+            result.output shouldContain "javaVersion"
+        }
+
+        /**
          * payaraVersion
          */
 

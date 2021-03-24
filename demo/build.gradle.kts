@@ -12,7 +12,7 @@ plugins {
  * plugin: payara-micro-gradle-plugin
  */
 payaraMicro {
-    javaBin = "java"
+    options = "--nocluster --port 8080".split(" ")
 }
 
 /**

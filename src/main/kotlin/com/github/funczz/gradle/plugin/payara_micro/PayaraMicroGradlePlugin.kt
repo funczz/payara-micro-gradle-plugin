@@ -9,9 +9,13 @@ import java.io.File
 
 /**
  * Plugin
+ * @author funczz
  */
 class PayaraMicroGradlePlugin : Plugin<Project> {
 
+    /**
+     * タスク グループ
+     */
     private val groupId = "payara micro"
 
     /**
@@ -83,7 +87,12 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             PayaraMicroGradlePluginExtension::class.java
         )
 
-        val javaBin = if (extension.javaBin.isNotBlank()) extension.javaBin else "java"
+        val javaBin = JavaRuntimeFinder.findBinPath(javaBin = extension.javaBin)
+
+        val javaVersionTimeout = when (extension.javaVersionTimeout >= 0L) {
+            true -> extension.javaVersionTimeout
+            else -> JavaRuntimeFinder.DEFAULT_TIMEOUT
+        }
 
         val archiveTimeout = when (extension.archiveTimeout >= 0L) {
             true -> extension.archiveTimeout
@@ -95,9 +104,24 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             else -> DEFAULT_TIMEOUT
         }
 
-        val versionTimeout = when (extension.versionTimeout >= 0L) {
-            true -> extension.versionTimeout
+        val payaraMicroVersionTimeout = when (extension.payaraMicroVersionTimeout >= 0L) {
+            true -> extension.payaraMicroVersionTimeout
             else -> DEFAULT_TIMEOUT
+        }
+
+        val processInitialDelay = when (extension.processInitialDelay >= 0L) {
+            true -> extension.processInitialDelay
+            else -> PayaraMicroProcess.DEFAULT_INITIAL_DELAY
+        }
+
+        val processPeriod = when (extension.processPeriod >= 0L) {
+            true -> extension.processPeriod
+            else -> PayaraMicroProcess.DEFAULT_PERIOD
+        }
+
+        val processTimeout = when (extension.processTimeout >= 0L) {
+            true -> extension.processTimeout
+            else -> PayaraMicroProcess.DEFAULT_TIMEOUT
         }
 
         val payaraMicroJar: () -> File = {
@@ -122,9 +146,9 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
                 rootWar = rootWar(),
                 rootDir = rootDir(),
                 options = extension.options,
-                initialDelay = extension.processInitialDelay,
-                period = extension.processPeriod,
-                timeout = extension.processTimeout,
+                initialDelay = processInitialDelay,
+                period = processPeriod,
+                timeout = processTimeout,
                 charset = extension.processCharset,
                 javaBin = javaBin,
             ).also { p ->
@@ -140,6 +164,20 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             }
         }
 
+        project.tasks.register("javaVersion") { task ->
+            task.apply {
+                group = groupId
+                doLast {
+                    println("jre bin: $javaBin")
+                    val result = JavaRuntimeFinder.getVersion(
+                        javaBin = javaBin,
+                        timeout = javaVersionTimeout,
+                    )
+                    println(result)
+                }
+            }
+        }
+
         project.tasks.register("payaraVersion") { task ->
             task.apply {
                 group = groupId
@@ -147,7 +185,7 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
                     val result = PayaraMicroVersion.get(
                         javaBin = javaBin,
                         payaraMicroJarFile = payaraMicroJar(),
-                        timeout = versionTimeout,
+                        timeout = payaraMicroVersionTimeout,
                     )
                     println(result)
                 }
