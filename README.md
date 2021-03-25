@@ -25,14 +25,16 @@ dependencies {
 ### options
 ```kotlin
 payaraMicro {
-    // java コマンドのフルパス (default: "java")
-    javaBin = "/PATH/TO/java"
+    // java コマンドのフルパス
+    // javaBin を指定した場合は優先して使用される
+    // javaBin の指定がない場合は $JAVA_HOME/bin/java が使用される
+    // $JAVA_HOME が未定義の場合は "java" が使用される
+    //javaBin = "/PATH/TO/java"
+    javaBin = ""
 
     // payara micro 起動オプションを配列で指定
-    options = listOf(
-        "--nocluster",
-        "--port",
-        "8081")
+    //options = listOf("--nocluster", "--port", "8081")
+    options = listOf()
 
     // war タスクまでの最大待機時間(ミリ秒)
     archiveTimeout = 60_000L
@@ -54,7 +56,7 @@ payaraMicro {
     processTimeout = -1L
 
     // payara micro プロセスの文字セット
-    processCharset = Charsets.UTF_8
+    processCharset = Charset.defaultCharset()
 }
 ```
 
@@ -84,6 +86,11 @@ How to use
 ### Payara Micro バージョンを取得
 ```console
 ./gradlew payaraVersion
+```
+
+### JRE バージョンを取得
+```console
+./gradlew javaVersion
 ```
 
 Demo

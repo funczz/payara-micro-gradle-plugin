@@ -87,7 +87,7 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
             PayaraMicroGradlePluginExtension::class.java
         )
 
-        val javaBin = if (extension.javaBin.isNotBlank()) extension.javaBin else "java"
+        val javaBin = JavaRuntimeFinder.findBinPath(javaBin = extension.javaBin)
 
         val archiveTimeout = when (extension.archiveTimeout >= 0L) {
             true -> extension.archiveTimeout
@@ -140,6 +140,20 @@ class PayaraMicroGradlePlugin : Plugin<Project> {
                 }
                 p.onError { e ->
                     throw e
+                }
+            }
+        }
+
+        project.tasks.register("javaVersion") { task ->
+            task.apply {
+                group = groupId
+                doLast {
+                    println("jre bin: $javaBin")
+                    val result = JavaRuntimeFinder.getVersion(
+                        javaBin = javaBin,
+                        timeout = versionTimeout,
+                    )
+                    println(result)
                 }
             }
         }
