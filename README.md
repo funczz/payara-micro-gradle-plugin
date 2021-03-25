@@ -32,18 +32,21 @@ payaraMicro {
     //javaBin = "/PATH/TO/java"
     javaBin = ""
 
+    // JRE バージョン情報取得までの最大待機時間(ミリ秒)
+    javaVersionTimeout = 60_000L
+    
     // payara micro 起動オプションを配列で指定
     //options = listOf("--nocluster", "--port", "8081")
     options = listOf()
 
-    // war タスクまでの最大待機時間(ミリ秒)
+    // war タスク完了までの最大待機時間(ミリ秒)
     archiveTimeout = 60_000L
 
-    // uberJar 生成の最大待機時間(ミリ秒)
+    // uberJar 生成完了までの最大待機時間(ミリ秒)
     uberJarTimeout = 60_000L
 
-    // バージョン情報取得までの最大待機時間(ミリ秒)
-    versionTimeout = 60_000L
+    // payara micro バージョン情報取得までの最大待機時間(ミリ秒)
+    payaraMicroVersionTimeout = 60_000L
 
     // payara micro プロセス開始前の待機時間(ミリ秒)
     processInitialDelay = 3_000L
@@ -52,8 +55,8 @@ payaraMicro {
     processPeriod = 1_000L
 
     // payara micro プロセスの最大待機時間(ミリ秒)
-    // 0 未満で無制限
-    processTimeout = -1L
+    // 0 以下で無制限
+    processTimeout = 0L
 
     // payara micro プロセスの文字セット
     processCharset = Charset.defaultCharset()

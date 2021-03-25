@@ -23,7 +23,7 @@ object JavaRuntimeFinder {
     /**
      * デフォルトのプロセス起動の制限時間
      */
-    private const val DEFAULT_TIMEOUT = 60_000L
+    const val DEFAULT_TIMEOUT = 60_000L
 
     /**
      * Java ランタイムのバージョンを取得する
