@@ -1,0 +1,74 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.funczz",
+    "module": "payara-micro-gradle-plugin",
+    "version": "1.0.0-rc.3",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "6.3",
+      "buildId": "z4d6jlgol5g3rjwmxf4sk4dg3m"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "payara-micro-gradle-plugin-1.0.0-rc.3.jar",
+          "url": "payara-micro-gradle-plugin-1.0.0-rc.3.jar",
+          "size": 90364,
+          "sha512": "4ce7adfe2d9a89af9a92e661be9c84f166ec365208be596815f19df8b9a9a1fb48fccea05d1a00d07149fc304c783aed9aa1998ac74a4351fea3a51373c7bbfd",
+          "sha256": "c445d96af0633a87aae0cd06f36eab39b7b958e4457e629b945121db61756eeb",
+          "sha1": "4f4032df687d0d0f1385edcc374a59887356affc",
+          "md5": "40f252231cc579ff5224b29621c46cde"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.localToProject": "public",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.4.30"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "payara-micro-gradle-plugin-1.0.0-rc.3.jar",
+          "url": "payara-micro-gradle-plugin-1.0.0-rc.3.jar",
+          "size": 90364,
+          "sha512": "4ce7adfe2d9a89af9a92e661be9c84f166ec365208be596815f19df8b9a9a1fb48fccea05d1a00d07149fc304c783aed9aa1998ac74a4351fea3a51373c7bbfd",
+          "sha256": "c445d96af0633a87aae0cd06f36eab39b7b958e4457e629b945121db61756eeb",
+          "sha1": "4f4032df687d0d0f1385edcc374a59887356affc",
+          "md5": "40f252231cc579ff5224b29621c46cde"
+        }
+      ]
+    }
+  ]
+}
