@@ -1,0 +1,73 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.funczz",
+    "module": "payara-micro-gradle-plugin",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.3.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "payara-micro-gradle-plugin-1.0.0.jar",
+          "url": "payara-micro-gradle-plugin-1.0.0.jar",
+          "size": 74061,
+          "sha512": "e76a3d8c44caac0142e4a6b0f99ba1289dda3284a083fca786d2a6a98eeaf383e1823d52ef758a2bfda1fb6ebc88b27d7ee1ca44f1fe73bf10fee4b0bc7840c7",
+          "sha256": "3a3c142ba0f1817a76d2a49a284deab13c71c1e8441b81bbed0a841edde7baab",
+          "sha1": "e880b5d86d27fa4ebe7ee27cbfbaa191012e974a",
+          "md5": "5b81b464cda67e3a0c8be526f942318e"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "payara-micro-gradle-plugin-1.0.0.jar",
+          "url": "payara-micro-gradle-plugin-1.0.0.jar",
+          "size": 74061,
+          "sha512": "e76a3d8c44caac0142e4a6b0f99ba1289dda3284a083fca786d2a6a98eeaf383e1823d52ef758a2bfda1fb6ebc88b27d7ee1ca44f1fe73bf10fee4b0bc7840c7",
+          "sha256": "3a3c142ba0f1817a76d2a49a284deab13c71c1e8441b81bbed0a841edde7baab",
+          "sha1": "e880b5d86d27fa4ebe7ee27cbfbaa191012e974a",
+          "md5": "5b81b464cda67e3a0c8be526f942318e"
+        }
+      ]
+    }
+  ]
+}
